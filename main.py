@@ -1,3 +1,5 @@
+from re import X
+from tkinter import Y
 import pygame, time
 from pygame.locals import *
 
@@ -69,6 +71,16 @@ class Ball:
         if self.y >= HEIGHT - 10:
             self.vely *= -1
 
+class Brick:
+    def __init__(self, x, y,isVisible):
+        self.x = x
+        self.y = y
+        self.width = 59
+        self.height = 15
+        self.isVisible = isVisible
+        
+    def makeBrick(self):
+        self.brickBody  = pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
 
 #   Creating paddle object
 paddle = Paddle(paddlex, paddley)
@@ -78,6 +90,21 @@ ball = Ball(ballx, bally, ball_speedX, ball_speedY)
 def check_collision(ball_body, paddle_body):
     if (ball_body.colliderect(paddle_body) and ball.y> (paddle.y - 5) and ball.x > paddle.x and ball.x < paddle.x + 130):    #checks for collision
         ball.vely  *= -1
+
+
+    
+brickList = []
+
+def addBricks():
+    global brickList
+    brickList = []
+    for i in range(6):
+        for j in range(11):
+            brickList.append(Brick(24 +j *69, 28 + i* 35 , True))
+
+addBricks()
+
+
 
 while (running):
     for event in pygame.event.get():
@@ -89,8 +116,12 @@ while (running):
                 running = False
                 
     win.fill((0, 0,0))
+    for item in brickList:
+        item.makeBrick()
+    
     paddle.createPaddle()
     ball.createBall()
     check_collision(ball.ballBody, paddle.paddleBody)
     pygame.display.update()
     countrate.tick(fps)
+    
