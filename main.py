@@ -1,9 +1,15 @@
-from turtle import width
-import pygame
+import pygame, time
 from pygame.locals import *
+
 WIDTH, HEIGHT = 800, 600
 CAPTION= "Smash Brick"
 white = (255, 255, 255)
+
+#   Animation
+countrate = pygame.time.Clock()
+fps = 60
+
+
 def createWindow(w,h, caption): 
     global win
     pygame.init()
@@ -11,12 +17,15 @@ def createWindow(w,h, caption):
     pygame.display.set_caption(caption)
 createWindow(WIDTH, HEIGHT, CAPTION)
 
-ball_speedX = 10
+#   Ball
+ballx, bally = 400, 300
+ball_speedX = 5
 ball_speedY = 5
 
 running = True
+
+#   Paddle
 paddlex, paddley  = WIDTH/2-20, HEIGHT -70
-ballx, bally = 400, 300
 class Paddle:
     width, height = 140, 15
     def __init__(self, paddlex, paddley):
@@ -30,7 +39,7 @@ class Paddle:
         if (mx >= 655):     self.x = 655
         else:   self.x = mx           
         self.y = paddley
-        pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
+        self.paddleBody = pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
         
 
 class Ball:
@@ -42,7 +51,7 @@ class Ball:
         self.velx= velocityX
         self.vely = velocityY
     def createBall(self):
-        pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
+        self.ballBody = pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
         self.ball_bouncing_mechanism()
         self.moveBall()
         
@@ -59,13 +68,18 @@ class Ball:
             self.vely *= -1
         if self.y >= HEIGHT - 10:
             self.vely *= -1
+
+
 #   Creating paddle object
 paddle = Paddle(paddlex, paddley)
 #   Creating ball
 ball = Ball(ballx, bally, ball_speedX, ball_speedY)
 
+def check_collision(ball_body, paddle_body):
+    if (ball_body.colliderect(paddle_body) and ball.y> (paddle.y - 5) and ball.x > paddle.x and ball.x < paddle.x + 130):    #checks for collision
+        ball.vely  *= -1
+
 while (running):
-    win.fill((0, 0,0))
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
@@ -73,6 +87,10 @@ while (running):
         if event.type == pygame.KEYDOWN:
             if event.key == K_q:
                 running = False
+                
+    win.fill((0, 0,0))
     paddle.createPaddle()
     ball.createBall()
+    check_collision(ball.ballBody, paddle.paddleBody)
     pygame.display.update()
+    countrate.tick(fps)
