@@ -19,8 +19,15 @@ class Paddle:
         self.y = paddley
         
     def createRectangle(self):
+        #   Get mouse postion as a tuple
+        mx, my = pygame.mouse.get_pos()
+        #   Set 'y' to original value to avoid moving up and down
+        if (mx >= 655):     self.x = 655
+        else:   self.x = mx           
+        self.y = paddley
         pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
-
+        
+    
 class Ball:
     def __init__(self, ballx, bally):
         self.ballx = ballx
@@ -31,10 +38,13 @@ class Ball:
 paddle = Paddle(paddlex, paddley)
 
 while (running):
-    win.fill((0, 0, 0))
+    win.fill((0, 0,0))
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
-    
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == K_q:
+                running = False
     paddle.createRectangle()
     pygame.display.update()
