@@ -87,11 +87,25 @@ paddle = Paddle(paddlex, paddley)
 #   Creating ball
 ball = Ball(ballx, bally, ball_speedX, ball_speedY)
 
-def check_collision(ball_body, paddle_body):
+def check_Ball_Paddle_collision(ball_body, paddle_body):
     if (ball_body.colliderect(paddle_body) and ball.y> (paddle.y - 5) and ball.x > paddle.x and ball.x < paddle.x + 130):    #checks for collision
         ball.vely  *= -1
 
+def check_Ball_Brick_collision():
     
+    
+    
+    
+    
+    for item in brickList:
+        #   Ball Brick Collision mechanism
+        if (ball.x >= item.x and ball.x <= item.x + item.width) or ball.x + ball.width >= item.x and ball.x + ball.width <= item.x + item.width:
+            if (ball.y >= item.y and ball.y <= item.y + item.height) or ball.y + ball.height >= item.y and ball.y + ball.height <= item.y + ball.height:
+                #   Bounce back
+                ball.vely *= -1
+                #   Remove collided brick from array
+                brickList.pop(brickList.index(item))
+
 brickList = []
 brickBody = []
 def addBricks():
@@ -101,10 +115,10 @@ def addBricks():
         for j in range(11):
             brickList.append(Brick(24 +j *69, 28 + i* 35 , True))
 
-    
+def youWin():
+    if len(brickList) == 0:
+        print("You win.")
 addBricks()
-
-    
 
 
 while (running):
@@ -126,13 +140,10 @@ while (running):
 
     paddle.createPaddle()
     ball.createBall()
-    check_collision(ball.ballBody, paddle.paddleBody)
-    
-    for item in brickList:
-        if (ball.x > item.x and ball.x < (item.x + 18)):
-            print(ball.y, item.y)
-            ball.vely *= -1
-            brickList.pop(brickList.index(item))
+    check_Ball_Paddle_collision(ball.ballBody, paddle.paddleBody)
+    check_Ball_Brick_collision()
+
+            
     pygame.display.update()
     countrate.tick(fps)
     
