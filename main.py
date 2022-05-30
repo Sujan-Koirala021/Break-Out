@@ -1,16 +1,18 @@
-from re import X
-from tkinter import Y
 import pygame, time
 from pygame.locals import *
 
 WIDTH, HEIGHT = 800, 600
 CAPTION= "Smash Brick"
 white = (255, 255, 255)
+brickColor = '#4fd0ff'
+paddleColor = '#eac700'
+defaultBallX, defaultBallY = WIDTH/2, HEIGHT/2
+lives = 3
 
 #   Animation
 countrate = pygame.time.Clock()
 fps = 60
-
+liveImg = pygame.image.load('heart.png')
 
 def createWindow(w,h, caption): 
     global win
@@ -41,7 +43,7 @@ class Paddle:
         if (mx >= 655):     self.x = 655
         else:   self.x = mx           
         self.y = paddley
-        self.paddleBody = pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
+        self.paddleBody = pygame.draw.rect(win, paddleColor, (self.x, self.y, self.width, self.height) )
         
 
 class Ball:
@@ -68,9 +70,15 @@ class Ball:
             self.velx *= -1
         if self.y <=5 :
             self.vely *= -1
+            
+    def checkMiss(self):
+        #   Check lives
         if self.y >= HEIGHT - 10:
-            self.vely *= -1
-
+            global lives
+            lives = lives - 1
+            #   Ball to default
+            self.x, self.y = defaultBallX, defaultBallY
+            pygame.time.wait(1000)
 class Brick:
     def __init__(self, x, y,isVisible):
         self.x = x
@@ -80,7 +88,7 @@ class Brick:
         self.isVisible = isVisible
         
     def makeBrick(self):
-        self.brickBody  = pygame.draw.rect(win, white, (self.x, self.y, self.width, self.height) )
+        self.brickBody  = pygame.draw.rect(win, brickColor, (self.x, self.y, self.width, self.height) )
 
 #   Creating paddle object
 paddle = Paddle(paddlex, paddley)
@@ -93,10 +101,6 @@ def check_Ball_Paddle_collision(ball_body, paddle_body):
 
 def check_Ball_Brick_collision():
     
-    
-    
-    
-    
     for item in brickList:
         #   Ball Brick Collision mechanism
         if (ball.x >= item.x and ball.x <= item.x + item.width) or ball.x + ball.width >= item.x and ball.x + ball.width <= item.x + item.width:
@@ -105,6 +109,10 @@ def check_Ball_Brick_collision():
                 ball.vely *= -1
                 #   Remove collided brick from array
                 brickList.pop(brickList.index(item))
+
+def checkGameOver():
+    if lives == 0:
+        pass
 
 brickList = []
 brickBody = []
@@ -136,14 +144,16 @@ while (running):
     for item in brickList:
         item.makeBrick()
         
-
+    for item in range(0, lives):
+        win.blit(liveImg, (item * 30,570))
 
     paddle.createPaddle()
+    ball.checkMiss()
     ball.createBall()
     check_Ball_Paddle_collision(ball.ballBody, paddle.paddleBody)
     check_Ball_Brick_collision()
 
-            
+    checkGameOver()
     pygame.display.update()
     countrate.tick(fps)
     
