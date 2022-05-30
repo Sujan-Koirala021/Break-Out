@@ -8,37 +8,6 @@ In Breakout, a layer of bricks lines the top third of the screen and the goal is
 import pygame, time
 from pygame.locals import *
 
-WIDTH, HEIGHT = 800, 600
-CAPTION= "Smash Brick"
-white = (255, 255, 255)
-brickColor = '#4fd0ff'
-paddleColor = '#eac700'
-defaultBallX, defaultBallY = WIDTH/2, HEIGHT/2
-lives = 3
-SCORE = 0
-
-#   Animation
-countrate = pygame.time.Clock()
-fps = 60
-
-#   Lives icon
-liveImg = pygame.image.load('heart.png')
-
-def createWindow(w,h, caption): 
-    global win
-    pygame.init()
-    win = pygame.display.set_mode((w, h))
-    pygame.display.set_caption(caption)
-createWindow(WIDTH, HEIGHT, CAPTION)
-
-#   Ball
-ballx, bally = 400, 300
-ball_speedX = 5
-ball_speedY = 5
-
-
-#   Paddle
-paddlex, paddley  = WIDTH/2-20, HEIGHT -70
 class Paddle:
     width, height = 140, 15
     def __init__(self, paddlex, paddley):
@@ -54,7 +23,7 @@ class Paddle:
         self.y = paddley
         self.paddleBody = pygame.draw.rect(win, paddleColor, (self.x, self.y, self.width, self.height) )
         
-
+        
 class Ball:
     height = 10
     width = 10
@@ -90,6 +59,8 @@ class Ball:
                 #   Ball to default
                 self.x, self.y = defaultBallX, defaultBallY
                 pygame.time.wait(1000)
+
+
 class Brick:
     def __init__(self, x, y,isVisible):
         self.x = x
@@ -101,12 +72,39 @@ class Brick:
     def makeBrick(self):
         self.brickBody  = pygame.draw.rect(win, brickColor, (self.x, self.y, self.width, self.height) )
 
-#   Creating paddle object
-paddle = Paddle(paddlex, paddley)
-#   Creating ball
-ball = Ball(ballx, bally, ball_speedX, ball_speedY)
 
-isGameOver = False
+#   GLOBALS
+WIDTH, HEIGHT = 800, 600
+CAPTION= "Smash Brick"
+white = (255, 255, 255)
+brickColor = '#4fd0ff'
+paddleColor = '#eac700'
+defaultBallX, defaultBallY = WIDTH/2, HEIGHT/2
+lives = 3
+SCORE = 0
+
+#   Ball
+ballx, bally = 400, 300
+ball_speedX = 5
+ball_speedY = 5
+
+#   Paddle
+paddlex, paddley  = WIDTH/2-20, HEIGHT -70
+
+#   Animation
+countrate = pygame.time.Clock()
+fps = 60
+
+#   Lives icon
+liveImg = pygame.image.load('heart.png')
+
+#   Create Window
+def createWindow(w,h, caption): 
+    global win
+    pygame.init()
+    win = pygame.display.set_mode((w, h))
+    pygame.display.set_caption(caption)
+
 
 def check_Ball_Paddle_collision(ball_body, paddle_body):
     if (ball_body.colliderect(paddle_body) and ball.y> (paddle.y - 5) and ball.x > paddle.x and ball.x < paddle.x + 130):    #checks for collision
@@ -141,7 +139,7 @@ def checkGameOver():
         pass
 
 brickList = []
-brickBody = []
+
 def addBricks():
     global brickList
     brickList = []
@@ -153,8 +151,22 @@ def youWin():
     if len(brickList) == 0:
         ball.x, ball.y = -10, -10
         addText(f"Congrats !!! Score : {SCORE} ", 450, 350, 30)
+
+createWindow(WIDTH, HEIGHT, CAPTION)
+
+#   Creating paddle object
+paddle = Paddle(paddlex, paddley)
+
+#   Creating ball object
+ball = Ball(ballx, bally, ball_speedX, ball_speedY)
+
+#   Brick sprites to screen
 addBricks()
 
+#   Bool gameover variable
+isGameOver = False
+
+#   Game State
 running = True
 
 while (running):
