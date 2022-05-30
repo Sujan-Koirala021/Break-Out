@@ -91,10 +91,9 @@ def check_collision(ball_body, paddle_body):
     if (ball_body.colliderect(paddle_body) and ball.y> (paddle.y - 5) and ball.x > paddle.x and ball.x < paddle.x + 130):    #checks for collision
         ball.vely  *= -1
 
-
     
 brickList = []
-
+brickBody = []
 def addBricks():
     global brickList
     brickList = []
@@ -102,8 +101,10 @@ def addBricks():
         for j in range(11):
             brickList.append(Brick(24 +j *69, 28 + i* 35 , True))
 
+    
 addBricks()
 
+    
 
 
 while (running):
@@ -116,12 +117,22 @@ while (running):
                 running = False
                 
     win.fill((0, 0,0))
+    
+    
     for item in brickList:
         item.makeBrick()
-    
+        
+
+
     paddle.createPaddle()
     ball.createBall()
     check_collision(ball.ballBody, paddle.paddleBody)
+    
+    for item in brickList:
+        if (ball.x > item.x and ball.x < (item.x + 18)):
+            print(ball.y, item.y)
+            ball.vely *= -1
+            brickList.pop(brickList.index(item))
     pygame.display.update()
     countrate.tick(fps)
     
