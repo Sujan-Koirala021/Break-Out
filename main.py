@@ -75,7 +75,7 @@ class Brick:
 
 #   GLOBALS
 WIDTH, HEIGHT = 800, 600
-CAPTION= "Smash Brick"
+CAPTION= "Break Out"
 white = (255, 255, 255)
 brickColor = '#4fd0ff'
 paddleColor = '#eac700'
