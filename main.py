@@ -1,3 +1,10 @@
+"""
+Break Out
+In Breakout, a layer of bricks lines the top third of the screen and the goal is to destroy them all by repeatedly bouncing a ball off a paddle into them.
+
+"""
+
+
 import pygame, time
 from pygame.locals import *
 
@@ -8,10 +15,13 @@ brickColor = '#4fd0ff'
 paddleColor = '#eac700'
 defaultBallX, defaultBallY = WIDTH/2, HEIGHT/2
 lives = 3
+SCORE = 0
 
 #   Animation
 countrate = pygame.time.Clock()
 fps = 60
+
+#   Lives icon
 liveImg = pygame.image.load('heart.png')
 
 def createWindow(w,h, caption): 
@@ -26,7 +36,6 @@ ballx, bally = 400, 300
 ball_speedX = 5
 ball_speedY = 5
 
-running = True
 
 #   Paddle
 paddlex, paddley  = WIDTH/2-20, HEIGHT -70
@@ -76,9 +85,11 @@ class Ball:
         if self.y >= HEIGHT - 10:
             global lives
             lives = lives - 1
-            #   Ball to default
-            self.x, self.y = defaultBallX, defaultBallY
-            pygame.time.wait(1000)
+            global isGameOver
+            if (isGameOver != 1):
+                #   Ball to default
+                self.x, self.y = defaultBallX, defaultBallY
+                pygame.time.wait(1000)
 class Brick:
     def __init__(self, x, y,isVisible):
         self.x = x
@@ -95,6 +106,8 @@ paddle = Paddle(paddlex, paddley)
 #   Creating ball
 ball = Ball(ballx, bally, ball_speedX, ball_speedY)
 
+isGameOver = False
+
 def check_Ball_Paddle_collision(ball_body, paddle_body):
     if (ball_body.colliderect(paddle_body) and ball.y> (paddle.y - 5) and ball.x > paddle.x and ball.x < paddle.x + 130):    #checks for collision
         ball.vely  *= -1
@@ -105,13 +118,26 @@ def check_Ball_Brick_collision():
         #   Ball Brick Collision mechanism
         if (ball.x >= item.x and ball.x <= item.x + item.width) or ball.x + ball.width >= item.x and ball.x + ball.width <= item.x + item.width:
             if (ball.y >= item.y and ball.y <= item.y + item.height) or ball.y + ball.height >= item.y and ball.y + ball.height <= item.y + ball.height:
+                #   Increase Score
+                global SCORE
+                SCORE += 1
                 #   Bounce back
                 ball.vely *= -1
                 #   Remove collided brick from array
                 brickList.pop(brickList.index(item))
 
+def addText(your_text, posX, posY, text_size):
+    font = pygame.font.Font('freesansbold.ttf', text_size)
+    text = font.render(your_text, True, white)
+    textRect = text.get_rect()
+    textRect.center = (posX, posY)
+    win.blit(text, textRect)
+
 def checkGameOver():
-    if lives == 0:
+    if lives <= 0 :
+        isGameOver = True
+        ball.x, ball.y = -10, -10
+        addText(f"Game Over !!! Score : {SCORE}", 450, 350, 30)
         pass
 
 brickList = []
@@ -125,9 +151,11 @@ def addBricks():
 
 def youWin():
     if len(brickList) == 0:
-        print("You win.")
+        ball.x, ball.y = -10, -10
+        addText(f"Congrats !!! Score : {SCORE} ", 450, 350, 30)
 addBricks()
 
+running = True
 
 while (running):
     for event in pygame.event.get():
@@ -153,6 +181,7 @@ while (running):
     check_Ball_Paddle_collision(ball.ballBody, paddle.paddleBody)
     check_Ball_Brick_collision()
 
+    addText(f"Score : {SCORE}", 740, 570, 20)
     checkGameOver()
     pygame.display.update()
     countrate.tick(fps)
